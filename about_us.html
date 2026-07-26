@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | The Perfect Brew</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #2c1b18;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+        body {
+            background-color: var(--coffee-light);
+            color: var(--coffee-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9rem; /* Adjusted base font size slightly smaller */
+        }
+
+        /* Top Navigation Bar Styling */
+        .navbar-custom {
+            background-color: var(--coffee-dark);
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(44, 27, 24, 0.7), rgba(44, 27, 24, 0.7)), url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1600') no-repeat center center/cover;
+            color: white;
+            padding: 80px 0; /* Reduced padding for tighter hero view */
+        }
+        .btn-coffee {
+            background-color: var(--coffee-accent);
+            color: white;
+            font-size: 1rem; /* Slightly smaller button text */
+            padding: 10px 24px;
+            transition: all 0.3s ease;
+        }
+        .btn-coffee:hover {
+            background-color: var(--coffee-dark);
+            color: white;
+            transform: scale(1.03);
+        }
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            max-width: 600px; /* Refined container max-width */
+        }
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+        
+        /* Adjusted contact & social links to be slightly smaller */
+        .medium-contact-link {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .medium-social-btn {
+            font-size: 1rem; 
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+        .map-container {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Head Bar with Top-Right Logout Button -->
+    <nav class="navbar navbar-custom px-4 py-3 shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-white mb-0 fs-5" href="dashboard.html">
+                <i class="bi bi-shop"></i> DP COFFEE SHOP
+            </a>
+            
+            <!-- Top Right Logout Button -->
+            <a href="index.html" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
+                <i class="bi bi-box-arrow-right me-1"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Header Section -->
+    <header class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-2">About Us</h1>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="container my-4 py-2 d-flex flex-column align-items-center">
+
+        <hr class="w-70 my-3 opacity-25">
+
+        <!-- Contact & Connections Center Column Grid Layout -->
+        <section id="contact" class="w-100 d-flex flex-column align-items-center gap-4">
+            
+            <div class="text-center mb-1">
+                <h2 class="display-6 fw-bold">Hi Online!</h2>
+                <p class="text-muted fs-6">Welcome to our About Us page...</p>
+            </div>
+
+            <!-- Direct Channels Card Field -->
+            <div class="contact-card p-4 p-md-5 text-center">
+                <h3 class="fs-3 fw-bold mb-4" style="color: var(--coffee-dark);">Direct Contact</h3>
+                
+                <div class="d-flex flex-column gap-3 align-items-center">
+                    <!-- Call Field -->
+                    <div class="p-1">
+                        <h5 class="mb-1 fw-bold fs-6"><i class="bi bi-telephone-fill text-success me-2"></i> Phone Support</h5>
+                        <a href="tel:+1234567890" class="text-decoration-none text-muted medium-contact-link">+1 (234) 567-890</a>
+                    </div>
+
+                    <hr class="w-50 my-1 opacity-25">
+
+                    <!-- Email Field -->
+                    <div class="p-1">
+                        <h5 class="mb-1 fw-bold fs-6"><i class="bi bi-envelope-fill text-danger me-2"></i> Email Address</h5>
+                        <a href="mailto:hello@yourcoffeeshop.com" class="text-decoration-none text-muted medium-contact-link">hello@yourcoffeeshop.com</a>
+                    </div>
+
+                    <hr class="w-50 my-1 opacity-25">
+
+                    <!-- WhatsApp Field -->
+                    <div class="p-1">
+                        <h5 class="mb-1 fw-bold fs-6"><i class="bi bi-whatsapp text-success me-2"></i> WhatsApp Business</h5>
+                        <a href="https://wa.me/1234567890" target="_blank" class="text-decoration-none text-muted medium-contact-link">Chat with Us</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Community Connection Card Field (Includes Facebook and YouTube) -->
+            <div class="contact-card p-4 p-md-5 text-center">
+                <h3 class="fs-3 fw-bold mb-2" style="color: var(--coffee-dark);">Follow Our Community</h3>
+                <p class="text-muted fs-6 mb-4">Connect with our active digital feeds and share your brew experiences!</p>
+                
+                <div class="d-flex flex-column gap-2 w-100 px-md-3">
+                    <!-- Facebook Anchor Element -->
+                    <a href="https://facebook.com" target="_blank" class="btn btn-outline-dark medium-social-btn d-flex align-items-center justify-content-center gap-3">
+                        <i class="bi bi-facebook text-primary fs-5"></i> <span>DP Coffee Shop Official</span>
+                    </a>
+
+                    <!-- YouTube Anchor Element -->
+                    <a href="https://youtube.com" target="_blank" class="btn btn-outline-dark medium-social-btn d-flex align-items-center justify-content-center gap-3">
+                        <i class="bi bi-youtube text-danger fs-5"></i> <span>DP Coffee Channel</span>
+                    </a>
+
+                    <!-- Instagram Anchor Element -->
+                    <a href="https://instagram.com" target="_blank" class="btn btn-outline-dark medium-social-btn d-flex align-items-center justify-content-center gap-3">
+                        <i class="bi bi-instagram text-danger fs-5"></i> <span>@YourCoffeeShop_IG</span>
+                    </a>
+
+                    <!-- TikTok Anchor Element -->
+                    <a href="https://tiktok.com" target="_blank" class="btn btn-outline-dark medium-social-btn d-flex align-items-center justify-content-center gap-3">
+                        <i class="bi bi-tiktok text-dark fs-5"></i> <span>@YourCoffeeShop_TikTok</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Center Interactive Map Action Button Trigger Components -->
+            <div class="text-center my-3">
+    <button type="button" class="btn btn-coffee rounded-pill shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#mapModal">
+        <i class="bi bi-geo-alt-fill me-2"></i> View Our Location on Map
+    </button>
+</div>
+
+<!-- Map Modal Component -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="mapModalLabel">
+                    <i class="bi bi-geo-alt-fill text-danger me-2"></i> Our Location - Wijerama
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-3">
+                <!-- Google Maps Embed for Wijerama, Sri Lanka -->
+                <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15844.75787889758!2d79.9147514!3d6.8678855!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae25a5286e100f9%3A0xc3f173f4bb023ef0!2sWijerama%2C%20Nugegoda!5e0!3m2!1sen!2slk!4v1710000000000!5m2!1sen!2slk" 
+                        width="600" 
+                        height="450" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+            
+        </section>
+    </main>
+
+    <!-- Map Layout Popup Overlay Architecture (Bootstrap Modal Component) -->
+    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                <div class="modal-header bg-dark text-white border-0 py-3 px-4" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fs-6" id="mapModalLabel"><i class="bi bi-map me-2"></i>Find Our Coffee Shop</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="map-container" style="height: 400px;">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.6175402035255!2d-73.98685368459392!3d40.74844047932828!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1672531122342!5m2!1sen!2sus" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JavaScript Bundle Component -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
