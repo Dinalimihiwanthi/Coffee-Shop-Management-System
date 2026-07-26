@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artisan Coffee Co. - Order Dispatch</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Leaflet CSS for Map Rendering -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        /* Cozy Coffee Shop Gradient + Background Overlay */
+        body {
+            background: linear-gradient(rgba(28, 13, 2, 0.85), rgba(43, 24, 16, 0.85)), 
+                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&q=80&w=1920') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #fff8f0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 60px 0;
+        }
+
+        /* Glassmorphic Order Panel Card Container */
+        .order-panel-card {
+            background: rgba(43, 24, 16, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 164, 96, 0.25);
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Top Right Navigation Button */
+        .logout-btn-top {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            color: #f4a460;
+            text-shadow: 0 0 10px rgba(244, 164, 96, 0.4);
+        }
+
+        .system-subtitle {
+            color: #d2691e;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+
+        /* Delivery Option Selectors (Interactive Cards) */
+        .delivery-card {
+            background: rgba(255, 248, 240, 0.04);
+            border: 2px solid rgba(244, 164, 96, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            height: 100%;
+        }
+
+        .delivery-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(244, 164, 96, 0.4);
+            background: rgba(255, 248, 240, 0.08);
+        }
+
+        /* Active Selected State Card Modification */
+        .delivery-card.active {
+            background: rgba(244, 164, 96, 0.12) !important;
+            border-color: #f4a460 !important;
+            box-shadow: 0 0 20px rgba(244, 164, 96, 0.25);
+        }
+
+        /* Hidden standard radio button system */
+        .delivery-radio {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* Icon Badge Configuration styling wrapper */
+        .partner-logo-box {
+            width: 65px;
+            height: 65px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 1.8rem;
+        }
+
+        /* Platform Color Themes Custom Styling overrides */
+        .bg-uber { background: rgba(16, 16, 16, 0.8); color: #06C167; border: 1px solid rgba(6, 193, 103, 0.3); }
+        .bg-pickme { background: rgba(255, 215, 0, 0.15); color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.3); }
+        .bg-store { background: rgba(244, 164, 96, 0.15); color: #f4a460; border: 1px solid rgba(244, 164, 96, 0.3); }
+
+        .partner-title {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        /* Action Buttons */
+        .btn-confirm {
+            background: linear-gradient(90deg, #d2691e 0%, #f4a460 100%);
+            border: none;
+            color: #1c0d02;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 4px 15px rgba(212, 105, 30, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 164, 96, 0.5);
+            color: #1c0d02;
+        }
+
+        /* Checkmark Floating Indicator */
+        .check-indicator {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            color: #f4a460;
+            font-size: 1.3rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .delivery-card.active .check-indicator {
+            opacity: 1;
+        }
+
+        /* Delivery Address & Map Styling */
+        #map {
+            height: 200px;
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(244, 164, 96, 0.3);
+            z-index: 1;
+        }
+
+        .address-box {
+            background: rgba(255, 248, 240, 0.08);
+            border: 1px solid rgba(244, 164, 96, 0.25);
+            border-radius: 12px;
+            color: #fff;
+        }
+
+        .address-box:focus {
+            background: rgba(255, 248, 240, 0.12);
+            border-color: #f4a460;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(244, 164, 96, 0.25);
+        }
+
+        .address-box::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container px-3">
+    <div class="order-panel-card p-4 p-md-5">
+
+        <!-- Top Right Navigation Button -->
+        <a href="pay.html" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold logout-btn-top">
+            <i class="bi bi-box-arrow-right me-1"></i> Back
+        </a>
+
+        <!-- Top Header Component -->
+        <div class="text-center mb-5 mt-2">
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                <i class="bi bi-bicycle brand-logo"></i>
+                <h2 class="text-white mb-0 fw-bold">ORDER DISPATCH</h2>
+            </div>
+            <span class="system-subtitle fw-bold text-uppercase">Select Delivery Method</span>
+        </div>
+
+        <!-- Form linked via handleFormSubmission -->
+        <form id="deliveryForm" onsubmit="handleFormSubmission(event)">
+            
+            <div class="row g-4 mb-4">
+                
+                <!-- Option 1: PickMe -->
+                <div class="col-12 col-md-4">
+                    <label class="delivery-card w-100" id="card-pickme" onclick="selectDeliveryPlatform('pickme')">
+                        <input type="radio" name="deliveryMethod" value="PickMe" class="delivery-radio" required>
+                        <i class="bi bi-check-circle-fill check-indicator"></i>
+                        
+                        <div class="partner-logo-box bg-pickme">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                        <h4 class="partner-title">PickMe</h4>
+                    </label>
+                </div>
+
+                <!-- Option 2: Uber Eats -->
+                <div class="col-12 col-md-4">
+                    <label class="delivery-card w-100" id="card-uber" onclick="selectDeliveryPlatform('uber')">
+                        <input type="radio" name="deliveryMethod" value="Uber Eats" class="delivery-radio">
+                        <i class="bi bi-check-circle-fill check-indicator"></i>
+                        
+                        <div class="partner-logo-box bg-uber">
+                            <i class="bi bi-bag-fill"></i>
+                        </div>
+                        <h4 class="partner-title">Uber Eats</h4>
+                    </label>
+                </div>
+
+                <!-- Option 3: Store Takeaway / Pickup -->
+                <div class="col-12 col-md-4">
+                    <label class="delivery-card w-100" id="card-store" onclick="selectDeliveryPlatform('store')">
+                        <input type="radio" name="deliveryMethod" value="Store Pickup" class="delivery-radio">
+                        <i class="bi bi-check-circle-fill check-indicator"></i>
+                        
+                        <div class="partner-logo-box bg-store">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <h4 class="partner-title">Dine In / Pick</h4>
+                    </label>
+                </div>
+
+            </div>
+
+            <!-- Dynamic Address Input & Leaflet Map Container -->
+            <div id="addressMapSection" class="mb-4">
+                <label for="deliveryAddress" class="form-label text-uppercase fw-bold text-warning small">
+                    <i class="bi bi-geo-alt-fill me-1"></i>Delivery Address & Location
+                </label>
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-dark border-secondary text-warning">
+                        <i class="bi bi-house-door-fill"></i>
+                    </span>
+                    <textarea id="deliveryAddress" rows="2" class="form-control address-box" placeholder="Enter delivery address or pin location on map..."></textarea>
+                </div>
+                
+                <!-- Map Container -->
+                <div id="map"></div>
+                <small class="text-white-50" style="font-size: 0.75rem;">
+                    <i class="bi bi-info-circle me-1"></i>Adjust your address text or click/drag the map pin to update drop-off location.
+                </small>
+            </div>
+
+            <!-- Footer & Submission Button -->
+            <div class="row pt-2 border-top border-secondary border-opacity-25 align-items-center">
+                <div class="col-12 col-sm-6 text-center text-sm-start mb-3 mb-sm-0">
+                    <a href="menu.html" class="text-warning text-decoration-none small fw-bold">
+                        <i class="bi bi-arrow-left me-2"></i>Return to Menu Screen
+                    </a>
+                </div>
+                <div class="col-12 col-sm-6">
+                    <!-- Submit button triggers handleFormSubmission -->
+                    <button type="submit" class="btn btn-confirm w-100 text-uppercase">
+                       Confirm & Generate Invoice <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Leaflet JS Engine -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    let map, marker;
+    let debounceTimer;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        initMap();
+        // Automatically select PickMe as default if nothing is selected
+        selectDeliveryPlatform('pickme');
+    });
+
+    function initMap() {
+        // Load saved coordinates from signup/localStorage or default to Colombo
+        const savedLat = parseFloat(localStorage.getItem('delivery_lat')) || 6.9271;
+        const savedLng = parseFloat(localStorage.getItem('delivery_lng')) || 79.8612;
+        const savedAddress = localStorage.getItem('delivery_address') || '';
+
+        const addressInput = document.getElementById('deliveryAddress');
+        if (savedAddress) {
+            addressInput.value = savedAddress;
+        }
+
+        // Initialize Map
+        map = L.map('map').setView([savedLat, savedLng], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([savedLat, savedLng], { draggable: true }).addTo(map);
+
+        // Address input typing geocode sync
+        addressInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                geocodeAddress(this.value);
+            }, 1000);
+        });
+
+        // Map Click sync
+        map.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+            marker.setLatLng([lat, lng]);
+            updateAddressFromCoords(lat, lng);
+        });
+
+        // Pin Drag sync
+        marker.on('dragend', function() {
+            const pos = marker.getLatLng();
+            updateAddressFromCoords(pos.lat, pos.lng);
+        });
+    }
+
+    function geocodeAddress(addressText) {
+        if (!addressText.trim()) return;
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressText)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+
+                    map.setView([lat, lon], 15);
+                    marker.setLatLng([lat, lon]);
+                    saveLocationState(addressText, lat, lon);
+                }
+            })
+            .catch(err => console.error('Geocoding error:', err));
+    }
+
+    function updateAddressFromCoords(lat, lng) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    document.getElementById('deliveryAddress').value = data.display_name;
+                    saveLocationState(data.display_name, lat, lng);
+                }
+            })
+            .catch(err => console.error('Reverse Geocoding error:', err));
+    }
+
+    function saveLocationState(address, lat, lng) {
+        localStorage.setItem('delivery_address', address);
+        localStorage.setItem('delivery_lat', lat);
+        localStorage.setItem('delivery_lng', lng);
+    }
+
+    function selectDeliveryPlatform(platformKey) {
+        document.querySelectorAll('.delivery-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        
+        const targetedCard = document.getElementById(`card-${platformKey}`);
+        if (targetedCard) {
+            targetedCard.classList.add('active');
+            const radioInput = targetedCard.querySelector('input[type="radio"]');
+            if (radioInput) {
+                radioInput.checked = true;
+            }
+        }
+
+        // Toggle address bar and map visibility based on choice
+        const mapSection = document.getElementById('addressMapSection');
+        if (platformKey === 'store') {
+            mapSection.style.display = 'none';
+        } else {
+            mapSection.style.display = 'block';
+            // Invalidate map size so Leaflet renders correctly after being reshown
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 100);
+        }
+    }
+
+    function handleFormSubmission(event) {
+        event.preventDefault();
+        
+        const selectedRadio = document.querySelector('input[name="deliveryMethod"]:checked');
+        
+        if (!selectedRadio) {
+            alert("Please select a delivery method before proceeding.");
+            return;
+        }
+        
+        const selectedMethod = selectedRadio.value;
+        
+        // Save selected option for print.html invoice step
+        localStorage.setItem('selectedDeliveryMethod', selectedMethod);
+        
+        // Save current address inputs if delivery mode is active
+        if (selectedMethod !== 'Store Pickup') {
+            const currentAddress = document.getElementById('deliveryAddress').value;
+            const currentPos = marker ? marker.getLatLng() : null;
+
+            localStorage.setItem('delivery_address', currentAddress);
+            if (currentPos) {
+                localStorage.setItem('delivery_lat', currentPos.lat);
+                localStorage.setItem('delivery_lng', currentPos.lng);
+            }
+        }
+        
+        // Redirect to print.html
+        window.location.href = 'print.html'; 
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Order System | DP COFFEE SHOP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #1c0d02 0%, #3d2314 40%, #2b1810 80%, #5c3a21 100%);
+            background-size: 300% 300%;
+            min-height: 100vh;
+            color: #fff8f0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 40px 0 160px 0; 
+        }
+
+        .dashboard-container {
+            background: rgba(43, 24, 16, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(244, 164, 96, 0.2);
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+        }
+
+        .brand-logo {
+            font-size: 2rem;
+            color: #f4a460;
+            text-shadow: 0 0 10px rgba(244, 164, 96, 0.4);
+        }
+
+        .filter-btn {
+            color: rgba(255, 244, 229, 0.7);
+            border: 1px solid rgba(244, 164, 96, 0.3);
+            border-radius: 12px;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: #f4a460 !important;
+            color: #1c0d02 !important;
+            font-weight: 600;
+            border-color: #f4a460;
+        }
+
+        .menu-card {
+            background: rgba(255, 248, 240, 0.05);
+            border: 1.5px solid rgba(244, 164, 96, 0.15);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.25s ease-in-out;
+            height: 100%;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(244, 164, 96, 0.4);
+        }
+
+        .menu-card.selected {
+            background: rgba(244, 164, 96, 0.12);
+            border-color: #f4a460 !important;
+            box-shadow: 0 0 20px rgba(244, 164, 96, 0.3);
+        }
+
+        .select-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #f4a460;
+            color: #1c0d02;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+        }
+
+        .menu-card.selected .select-badge {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .menu-img-wrapper {
+            width: 100%;
+            height: 160px;
+            position: relative;
+            background: rgba(43, 24, 16, 0.5);
+        }
+
+        .menu-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .menu-details {
+            padding: 15px;
+        }
+
+        .item-title {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .item-price {
+            color: #f4a460;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        .payment-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(28, 13, 2, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 2px solid rgba(244, 164, 96, 0.3);
+            padding: 20px 0;
+            z-index: 1000;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            color: rgba(255, 244, 229, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .btn-pay {
+            background: linear-gradient(90deg, #d2691e 0%, #f4a460 100%);
+            border: none;
+            color: #1c0d02;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border-radius: 14px;
+            padding: 14px 40px;
+            box-shadow: 0 4px 15px rgba(212, 105, 30, 0.4);
+            transition: all 0.25s ease;
+        }
+
+        .btn-pay:hover:not([disabled]) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 164, 96, 0.6);
+        }
+
+        .btn-pay:disabled {
+            background: #4a3b32 !important;
+            color: rgba(255,255,255,0.2) !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="dashboard-container">
+        
+        <!-- Header Setup Row with Top Right Logout Button -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom border-secondary border-opacity-25 pb-4 mb-4 gap-3">
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-logo"><i class="bi bi-shop"></i></div>
+                    <h2 class="text-white mb-0 fw-bold">DP COFFEE SHOP</h2>
+                </div>
+                <span class="fw-bold text-uppercase text-white-50 small">Management Menu Terminal</span>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button class="btn btn-outline-warning btn-sm" onclick="selectAllItems()">Select All</button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="clearSelection()">Clear</button>
+                <!-- Added Top-Right Logout Button -->
+                <a href="index.html" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold ms-md-2">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Navigation Links -->
+        <div class="d-flex flex-wrap gap-2 mb-4 justify-content-start">
+            <button class="btn filter-btn active" onclick="filterMenu('all')">All Menu</button>
+            <button class="btn filter-btn" onclick="filterMenu('drinks')">Drinks</button>
+            <button class="btn filter-btn" onclick="filterMenu('bakery')">Fresh Bakery</button>
+            <button class="btn filter-btn" onclick="filterMenu('mains')">Mains & Wraps</button>
+            <button class="btn filter-btn" onclick="filterMenu('desserts')">Desserts</button>
+        </div>
+
+        <!-- Dynamic Grid Layout Wrapper -->
+        <div class="row g-4" id="menuItemsGrid"></div>
+
+    </div>
+</div>
+
+<!-- Bottom Fixed Totals/Processing Bar -->
+<div class="payment-bar">
+    <div class="container">
+        <div class="row align-items-center justify-content-between">
+            <div class="col-12 col-sm-auto mb-3 mb-sm-0 text-center text-sm-start">
+                <div class="d-flex align-items-center justify-content-center justify-content-sm-start gap-4">
+                    <div>
+                        <div class="summary-label">Items Selected</div>
+                        <div class="summary-value" id="selectedCount">0</div>
+                    </div>
+                    <div class="border-start border-secondary border-opacity-50 ps-4">
+                        <div class="summary-label">Total Amount</div>
+                        <div class="summary-value text-warning" id="totalPrice">Rs. 0.00</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-auto text-center">
+                <button id="payButton" class="btn btn-pay btn-lg text-uppercase w-100" disabled onclick="executePaymentProcess()">
+                    <i class="bi bi-printer-fill me-2"></i>Proceed to Pay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // CLEANLY ORGANIZED DATA ARRAY
+    const javaBackendMenuData = [
+        // ==================== CATEGORY: DRINKS ====================
+        { id: 1, name: "Lemonade", category: "drinks", basePrice: 300.00, imageUrl: "https://media.istockphoto.com/id/1366063737/photo/lemonade-with-lemon-mint-and-ice-cubes-in-glass.jpg?s=170667a&w=0&k=20&c=tC_xdmNsLki7BlU3qq49KuZDPasFdX4ycGyX8GzJwR8=" },
+        { id: 2, name: "Iced Tea", category: "drinks", basePrice: 300.00, imageUrl: "https://i.pinimg.com/736x/ce/1d/2d/ce1d2d9ab6522568a576c22175e58935.jpg" },
+        { id: 3, name: "Hot Chocolate", category: "drinks", basePrice: 650.00, imageUrl: "https://static.vecteezy.com/system/resources/previews/051/247/783/non_2x/warm-hot-chocolate-with-marshmallows-and-chocolate-sticks-in-a-cozy-winter-setting-free-photo.jpeg" },
+        { id: 4, name: "Tea", category: "drinks", basePrice: 50.00, imageUrl: "https://png.pngtree.com/thumb_back/fw800/background/20240721/pngtree-tea-in-a-round-white-cup-with-a-saucer-image_15904893.jpg" },
+        { id: 5, name: "Coffee", category: "drinks", basePrice: 50.00, imageUrl: "https://i.pinimg.com/736x/de/58/47/de5847002eaa5f7b9d0a89e432f58f3b.jpg" },
+        { id: 6, name: "Orange Juice", category: "drinks", basePrice: 300.00, imageUrl: "https://recipezesty.com/wp-content/uploads/2025/11/Fresh-Orange-Juice.png" },
+        { id: 7, name: "Yogurt Drink", category: "drinks", basePrice: 70.00, imageUrl: "https://tse3.mm.bing.net/th/id/OIP.ImJ79iboxCbDN6RiprTYlAHaE8?r=0&w=1050&h=700&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 8, name: "Milkshake", category: "drinks", basePrice: 350.00, imageUrl: "https://insanelygoodrecipes.com/wp-content/uploads/2024/01/Starbucks-Strawberry-Frappuccino-with-Bowl-of-Fresh-Strawberries-1024x1536.jpg" },
+        { id: 9, name: "Chocolate Shake", category: "drinks", basePrice: 400.00, imageUrl: "https://tse1.mm.bing.net/th/id/OIP.boepDONAa4wUdwbP3y8SUwHaJ4?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 10, name: "Coconut Water", category: "drinks", basePrice: 300.00, imageUrl: "https://img.freepik.com/premium-photo/glass-with-fresh-coconut-water-coconuts-table_434193-9777.jpg" },
+        { id: 11, name: "Papaya Smoothie", category: "drinks", basePrice: 300.00, imageUrl: "https://th.bing.com/th/id/R.b52eaf7952efa2a9fe2abb6742c00866?rik=k69fpM4%2fFTklPg&pid=ImgRaw&r=0" },
+        { id: 12, name: "Milk", category: "drinks", basePrice: 200.00, imageUrl: "https://media.istockphoto.com/id/679691966/photo/a-glass-of-milk-on-the-white-background.jpg?s=170667a&w=0&k=20&c=exWoEkTy7GwtZP4nSAGnGT8cKuMhWTWyhNXtUEkt9d4=" },
+        { id: 13, name: "Cappuccino", category: "drinks", basePrice: 500.00, imageUrl: "https://tse2.mm.bing.net/th/id/OIP.44qSatO1_Qd3DQ4fZc02EAHaEo?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 14, name: "Mojito", category: "drinks", basePrice: 400.00, imageUrl: "https://tse3.mm.bing.net/th/id/OIP.Jq-XAt_yf0m3UYR2B44ILwHaLH?r=0&w=1200&h=1800&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 15, name: "Green Tea", category: "drinks", basePrice: 400.00, imageUrl: "https://img.freepik.com/premium-photo/green-tea-brewed-cup-with-tea-leaves-table-closeup_1220-5332.jpg?w=2000" },
+
+        // ==================== CATEGORY: BAKERY ====================
+        { id: 16, name: "Fish Bun", category: "bakery", basePrice: 100.00, imageUrl: "https://i.pinimg.com/originals/25/b5/30/25b530fedbbe25f63d551d09f6e80a93.jpg" },
+        { id: 17, name: "Fish Roll", category: "bakery", basePrice: 150.00, imageUrl: "https://www.grandchancellor.lk/wp-content/uploads/2022/12/Fish-2-2048x2048.jpg" },
+        { id: 18, name: "Crocodile Bun", category: "bakery", basePrice: 80.00, imageUrl: "https://i.pinimg.com/736x/12/09/69/120969657f95d7d8e9268a1de70b615e.jpg" },
+        { id: 19, name: "Pattis", category: "bakery", basePrice: 90.00, imageUrl: "https://i.pinimg.com/originals/94/b1/68/94b168a11a9eeefb02785beaab4db565.jpg" },
+        { id: 20, name: "Burger", category: "bakery", basePrice:200.00, imageUrl: "https://t4.ftcdn.net/jpg/11/09/94/59/360_F_1109945910_PbXLqPykDiaDxagbrbIPuuUYDeyecKAn.jpg" },
+        { id: 21, name: "Mini Pizza", category: "bakery", basePrice: 50.00, imageUrl: "https://snapcalorie-webflow-website.s3.us-east-2.amazonaws.com/media/food_pics_v2/mini_pizza.jpg" },
+        { id: 22, name: "Pastry", category: "bakery", basePrice: 150.00, imageUrl: "https://cdn.pixabay.com/photo/2021/06/09/01/38/bread-6322034_640.jpg" },
+        { id: 23, name: "Samosa", category: "bakery", basePrice: 150.00, imageUrl: "https://c.ndtvimg.com/2022-09/lpcnb0g8_samosa_625x300_29_September_22.jpg?im=FaceCrop,algorithm=dnn,width=1200,height=675" },
+        { id: 24, name: "Sosejes Bun", category: "bakery", basePrice: 150.00, imageUrl: "https://www.ohmyfoodrecipes.com/wp-content/uploads/2019/09/hotdogbun14-768x512.jpg" },
+        { id: 25, name: "Plain Bun", category: "bakery", basePrice: 70.00, imageUrl: "https://www.brunchnbites.com/wp-content/uploads/2023/07/Joshua-Weissman-Burger-Buns.png" },
+        { id: 26, name: "Suger Bun", category: "bakery", basePrice: 70.00, imageUrl: "https://thumbs.dreamstime.com/b/homemade-fresh-sugar-buns-tray-sugar-buns-tray-closeup-view-207395493.jpg" },
+        { id: 27, name: "Sandwich", category: "bakery", basePrice: 150.00, imageUrl: "https://kitchenjs.com/wp-content/uploads/2024/01/1-15.jpg" },
+        { id: 28, name: "Bread", category: "bakery", basePrice: 120.00, imageUrl: "https://bakefresh.net/wp-content/uploads/2010/11/IMG_3871.jpg" },
+        { id: 29, name: "Muffin", category: "bakery", basePrice: 100.00, imageUrl: "https://insanelygoodrecipes.com/wp-content/uploads/2023/09/Banana-Chocolate-Chip-Muffins-in-Plate-500x500.jpg" },
+        { id: 30, name: "Cupcake", category: "bakery", basePrice: 130.00, imageUrl: "https://th.bing.com/th/id/R.a075c8f0f9c308e5f025e3b0e51bed9f?rik=24XXveMIqSkVKg&riu=http%3a%2f%2f4.bp.blogspot.com%2f-TgxnxZy2EjY%2fTkiN1LyiTmI%2fAAAAAAAACKk%2fI_8zxxVPKPc%2fs1600%2fIMG_6155csqs.jpg&ehk=0SPWBbzqYsuXrwHWP%2biGA3SJxRqn3Z7yiYXRWdo%2bDGY%3d&risl=&pid=ImgRaw&r=0" },
+
+        // ==================== CATEGORY: MAINS ====================
+        { id: 31, name: "Fried Rice", category: "mains", basePrice: 500.00, imageUrl: "https://www.nestleprofessional.in/sites/default/files/2022-07/Fried-Rice.jpg" },
+        { id: 32, name: "Biryani", category: "mains", basePrice: 550.00, imageUrl: "https://www.thespruceeats.com/thmb/XDBL9gA6A6nYWUdsRZ3QwH084rk=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/SES-chicken-biryani-recipe-7367850-hero-A-ed211926bb0e4ca1be510695c15ce111.jpg" },
+        { id: 33, name: "Nasi Goreng", category: "mains", basePrice: 550.00, imageUrl: "https://tse4.mm.bing.net/th/id/OIP.TMTXJQu_Ve8klCb2uc79dAHaFj?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 34, name: "Pasta", category: "mains", basePrice: 400.00, imageUrl: "https://forkandpan.com/wp-content/uploads/2025/04/Penne_Arrabbiata.webp" },
+        { id: 35, name: "Noodles", category: "mains", basePrice: 400.00, imageUrl: "https://nurturedhomes.com/wp-content/uploads/2023/02/story-garlic-noodles.jpg" },
+        { id: 36, name: "Kottu", category: "mains", basePrice: 500.00, imageUrl: "https://cdn.pixabay.com/photo/2021/06/08/01/26/kottu-6319357_640.jpg" },
+        { id: 37, name: "Rice and Curry", category: "mains", basePrice: 700.00, imageUrl: "https://img.freepik.com/premium-photo/sri-lanka-rice-curry_1003686-23347.jpg" },
+        { id: 38, name: "Plain Hoppers", category: "mains", basePrice: 20.00, imageUrl: "https://cdn.pixabay.com/photo/2021/06/04/01/48/asian-6308469_1280.jpg" },
+        { id: 39, name: "Egg Hopper", category: "mains", basePrice: 30.00, imageUrl: "https://www.bespokesrilankatravel.co.uk/wp-content/uploads/2019/03/Sri-Lankan-Egg-Hoppers-1024x711.jpg" },
+        { id: 40, name: "String Hoppers", category: "mains", basePrice: 5.00, imageUrl: "https://ucarecdn.com/c4172c00-b4ac-4b00-8000-0aeca764f4c9/-/scale_crop/1280x960/center/-/quality/normal/-/format/jpeg/idiyappam-string-hoppers.jpg" },
+        { id: 41, name: "Pol Roti", category: "mains", basePrice: 100.00, imageUrl: "https://www.theflavorbender.com/wp-content/uploads/2020/05/Pol-Roti-SM-6714-1536x1536.jpg" },
+
+        // ==================== CATEGORY: DESSERTS ====================
+        { id: 42, name: "Vanilla Ice Cream", category: "desserts", basePrice: 100.00, imageUrl: "https://icecreamin.com/wp-content/uploads/2024/11/How-to-Make-French-Vanilla-Ice-Cream.jpg" },
+        { id: 43, name: "Chocolate Ice Cream", category: "desserts", basePrice: 120.00, imageUrl: "https://tse1.explicit.bing.net/th/id/OIP.YNzm_yG-fNlGEzh0wea8qwHaLH?r=0&rs=1&pid=ImgDetMain&o=7&rm=3" },
+        { id: 44, name: "Watalappan", category: "desserts", basePrice: 150.00, imageUrl: "https://i.pinimg.com/736x/d8/5c/94/d85c942547aeb787f991b3655c76533c.jpg" },
+        { id: 45, name: "Caramel Pudding", category: "desserts", basePrice: 150.00, imageUrl: "https://img.freepik.com/premium-photo/caramel-custard-pudding_756748-46872.jpg" },
+        { id: 46, name: "Fruits Salad", category: "desserts", basePrice: 220.00, imageUrl: "https://img.freepik.com/premium-photo/fruit-salad-white-background_871209-2101.jpg?w=996" },
+        { id: 47, name: "Cake", category: "desserts", basePrice: 50.00, imageUrl: "https://thenovicechefblog.com/wp-content/uploads/2020/05/Best-Chocolate-Cake-Recipe-7.jpeg" },
+        { id: 48, name: "American Pancake", category: "desserts", basePrice: 100.00, imageUrl: "https://flavorfulhaven.com/wp-content/uploads/2025/04/lailaserv_simple_photo_of_Fluffy_American_Pancakes_taken_with_a_0aa845b0-5f87-4f9a-9c4c-ea4ef4fa2d65.webp" },
+        { id: 49, name: "Jelly", category: "desserts", basePrice: 100.00, imageUrl: "https://i.pinimg.com/originals/cd/5b/81/cd5b81efa8b3a34d5c415f8568b92cc1.webp" },
+        { id: 50, name: "Yogurt", category: "desserts", basePrice: 120.00, imageUrl: "https://nainasindiankitchen.com/wp-content/uploads/2023/10/Plain-Yogurt-1.png" },
+        { id: 51, name: "Mee Kiri", category: "desserts", basePrice: 100.00, imageUrl: "https://www.gzrecipes.com/content/uploads/sites/2/2025/11/IMG_8257-scaled-7-69258e75b31f60-27783132-768x1024.jpeg" }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderMenuInterface(javaBackendMenuData);
+    });
+
+    function renderMenuInterface(items) {
+        const targetGrid = document.getElementById("menuItemsGrid");
+        targetGrid.innerHTML = ""; 
+
+        items.forEach(item => {
+            const cardMarkup = `
+                <div class="col-12 col-md-6 col-lg-4 menu-item-node" data-category="${item.category}">
+                    <div class="menu-card" data-id="${item.id}" data-name="${item.name}" data-price="${item.basePrice.toFixed(2)}" onclick="toggleItemSelection(this)">
+                        <div class="select-badge"><i class="bi bi-check-lg"></i></div>
+                        <div class="menu-img-wrapper">
+                            <img src="${item.imageUrl}" alt="${item.name}" loading="lazy">
+                        </div>
+                        <div class="menu-details d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="item-title mb-1">${item.name}</h4>
+                                <small class="text-white-50 text-uppercase tracking-wider small">${item.category}</small>
+                            </div>
+                            <span class="item-price">Rs. ${item.basePrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            targetGrid.insertAdjacentHTML('beforeend', cardMarkup);
+        });
+    }
+
+    function toggleItemSelection(cardElement) {
+        cardElement.classList.toggle('selected');
+        calculateReceiptTotal();
+    }
+
+    function selectAllItems() {
+        const visibleCards = document.querySelectorAll('.menu-item-node[style="display: block;"] .menu-card, .menu-item-node:not([style]) .menu-card');
+        visibleCards.forEach(card => card.classList.add('selected'));
+        calculateReceiptTotal();
+    }
+
+    function clearSelection() {
+        const cards = document.querySelectorAll('.menu-card');
+        cards.forEach(card => card.classList.remove('selected'));
+        calculateReceiptTotal();
+    }
+
+    function filterMenu(category) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        if(window.event) { window.event.target.classList.add('active'); }
+
+        const elements = document.querySelectorAll('.menu-item-node');
+        elements.forEach(el => {
+            if (category === 'all' || el.getAttribute('data-category') === category) {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        });
+    }
+
+    function calculateReceiptTotal() {
+        const selectedCards = document.querySelectorAll('.menu-card.selected');
+        let runningTotal = 0;
+
+        selectedCards.forEach(card => {
+            runningTotal += parseFloat(card.getAttribute('data-price'));
+        });
+
+        document.getElementById('selectedCount').innerText = selectedCards.length;
+        document.getElementById('totalPrice').innerText = `Rs. ${runningTotal.toFixed(2)}`;
+
+        const payButton = document.getElementById('payButton');
+        if (selectedCards.length > 0) {
+            payButton.removeAttribute('disabled');
+        } else {
+            payButton.setAttribute('disabled', 'true');
+        }
+    }
+
+    function executePaymentProcess() {
+        const selectedItems = [];
+        const selectedCards = document.querySelectorAll('.menu-card.selected');
+
+        let customerPhone = "Walk-in Customer";
+        const savedProfile = localStorage.getItem("signupUserRecord");
+        
+        if (savedProfile) {
+            const parsedProfile = JSON.parse(savedProfile);
+            if (parsedProfile.phone) {
+                customerPhone = parsedProfile.phone; 
+            }
+        }
+
+        selectedCards.forEach(card => {
+            selectedItems.push({
+                id: card.getAttribute('data-id'),
+                name: card.getAttribute('data-name'),
+                price: parseFloat(card.getAttribute('data-price'))
+            });
+        });
+
+        let grandTotal = 0;
+        selectedItems.forEach(i => grandTotal += i.price);
+
+        const checkoutPayload = {
+            customerPhone: customerPhone, 
+            items: selectedItems,
+            totalAmount: grandTotal.toFixed(2)
+        };
+        
+        localStorage.setItem("checkoutOrderPayload", JSON.stringify(checkoutPayload));
+        window.location.href = 'pay.html';
+    }
+</script>
+</body>
+</html>
