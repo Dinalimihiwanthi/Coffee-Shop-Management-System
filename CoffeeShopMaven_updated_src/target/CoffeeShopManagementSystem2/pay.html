@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout | DP COFFEE SHOP</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --coffee-dark: #1c0d02;
+            --coffee-medium: #3d2314;
+            --coffee-accent: #f4a460;
+            --coffee-glow: rgba(244, 164, 96, 0.25);
+            --glass-bg: rgba(28, 13, 2, 0.82);
+        }
+        body {
+            /* High-resolution warm coffee art & espresso table background */
+            background: linear-gradient(rgba(18, 10, 8, 0.78), rgba(18, 10, 8, 0.85)), 
+                        url('https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover fixed;
+            min-height: 100vh;
+            color: #fff8f0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+            margin: 0;
+        }
+        .checkout-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 164, 96, 0.25);
+            border-radius: 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            width: 100%;
+            max-width: 680px;
+            position: relative;
+        }
+        .logout-btn-top {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 10;
+        }
+        .invoice-card {
+            background: rgba(255, 248, 240, 0.05);
+            border: 1px dashed rgba(244, 164, 96, 0.3);
+            border-radius: 16px;
+        }
+        .form-control-coffee {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(244, 164, 96, 0.3);
+            color: #fff8f0 !important;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .form-control-coffee:focus {
+            background: rgba(0, 0, 0, 0.6);
+            border-color: var(--coffee-accent);
+            box-shadow: 0 0 0 0.25rem var(--coffee-glow);
+        }
+        .nav-pills .nav-link {
+            color: rgba(255, 244, 229, 0.6);
+            border: 1px solid rgba(244, 164, 96, 0.2);
+            margin-right: 10px;
+            border-radius: 12px;
+        }
+        .nav-pills .nav-link.active {
+            background: var(--coffee-accent);
+            color: var(--coffee-dark);
+            font-weight: 700;
+        }
+        .btn-confirm {
+            background: linear-gradient(90deg, #d2691e 0%, #f4a460 100%);
+            color: #1c0d02;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: 0 5px 20px rgba(212, 105, 30, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(244, 164, 96, 0.6);
+            color: #1c0d02;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(244, 164, 96, 0.3);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(244, 164, 96, 0.5);
+        }
+    </style>
+</head>
+<body class="p-3">
+
+<div class="checkout-container p-4 p-md-5">
+    
+    <!-- Top Right Logout / Back Button -->
+    <a href="menu.html" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold logout-btn-top">
+        <i class="bi bi-box-arrow-right me-1"></i> Back
+    </a>
+
+    <!-- Header -->
+    <div class="text-center mb-4 mt-2">
+        <div class="text-warning display-6 mb-2"><i class="bi bi-credit-card-2-front-fill" style="color: var(--coffee-accent);"></i></div>
+        <h2 class="fw-bold mb-1">Order Checkout</h2>
+        <p class="text-white-50 small text-uppercase">DP Coffee Shop Billing Terminal</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Order Summary Matrix Column -->
+        <div class="col-12 col-md-6">
+            <h5 class="text-warning mb-3 fw-bold"><i class="bi bi-receipt me-2"></i>Order Summary</h5>
+            <div class="invoice-card p-3">
+                <div id="invoiceItems" style="max-height: 200px; overflow-y: auto;" class="mb-3 custom-scrollbar">
+                    <!-- Dynamic Items segment -->
+                </div>
+                <div class="border-top border-secondary border-opacity-50 pt-3">
+                    <div class="d-flex justify-content-between small text-white-50 mb-1">
+                        <span>Items Count:</span>
+                        <span id="summaryCount">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold fs-5 text-white">
+                        <span>Total Payable:</span>
+                        <span class="text-warning" id="summaryTotal">Rs. 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Processing Column -->
+        <div class="col-12 col-md-6">
+            <h5 class="text-warning mb-3 fw-bold"><i class="bi bi-wallet2 me-2"></i>Payment Information</h5>
+            
+            <ul class="nav nav-pills mb-3" id="paymentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="card-tab" data-bs-toggle="pill" data-bs-target="#cardMethod" type="button" role="tab">Card</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="cash-tab" data-bs-toggle="pill" data-bs-target="#cashMethod" type="button" role="tab">Counter Cash</button>
+                </li>
+            </ul>
+
+            <form id="paymentForm" onsubmit="processTransaction(event)">
+                <div class="tab-content" id="paymentTabContent">
+                    <div class="tab-pane fade show active" id="cardMethod" role="tabpanel">
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase">Cardholder Name</label>
+                            <input type="text" class="form-control form-control-coffee" id="cardName" placeholder="John Doe">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase">Card Number</label>
+                            <input type="text" class="form-control form-control-coffee" id="cardNumber" placeholder="0000 0000 0000 0000">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small text-uppercase">Expiry</label>
+                                <input type="text" class="form-control form-control-coffee" id="cardExpiry" placeholder="MM/YY">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small text-uppercase">CVC</label>
+                                <input type="password" class="form-control form-control-coffee" id="cardCvc" placeholder="•••">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="cashMethod" role="tabpanel">
+                        <div class="p-3 bg-black bg-opacity-25 rounded-3 border border-secondary border-opacity-25 mb-3 text-center">
+                            <i class="bi bi-shop-window display-6 text-white-50 mb-2 d-block"></i>
+                            <p class="small text-white-50 mb-0">Confirm order now and process the cash payment directly via the shop counter POS operator.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-confirm w-100 mt-2 text-uppercase border-0">
+                    <i class="bi bi-lock-fill me-2"></i>Authorize Payment
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Retrieve payload transaction from local storage
+        const payloadData = localStorage.getItem("checkoutOrderPayload");
+        const orderData = payloadData ? JSON.parse(payloadData) : { items: [], totalAmount: "0.00" };
+        
+        const itemsContainer = document.getElementById("invoiceItems");
+        itemsContainer.innerHTML = ""; 
+
+        const itemsList = orderData.items || [];
+        document.getElementById("summaryCount").innerText = itemsList.length;
+
+        // Calculate total payable robustly
+        let calculatedTotal = 0;
+        
+        if (itemsList.length > 0) {
+            itemsList.forEach(item => {
+                const itemPrice = parseFloat(item.price) || 0;
+                calculatedTotal += itemPrice;
+
+                const row = document.createElement("div");
+                row.className = "d-flex justify-content-between align-items-center mb-2 small border-bottom border-secondary border-opacity-10 pb-1";
+                row.innerHTML = `
+                    <div>
+                        <span class="fw-bold text-white">${item.name || item.title || 'Item'}</span>
+                        <br><small class="text-white-50">Item ID: ${item.id}</small>
+                    </div>
+                    <span class="text-warning fw-semibold">Rs. ${itemPrice.toFixed(2)}</span>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            // Format total payable display
+            const finalDisplayTotal = orderData.totalAmount ? parseFloat(orderData.totalAmount).toFixed(2) : calculatedTotal.toFixed(2);
+            document.getElementById("summaryTotal").innerText = `Rs. ${finalDisplayTotal}`;
+        } else {
+            itemsContainer.innerHTML = `<div class="text-center text-muted py-4">No item payload structured.</div>`;
+            document.getElementById("summaryTotal").innerText = "Rs. 0.00";
+        }
+    });
+
+    async function processTransaction(event) {
+        event.preventDefault();
+
+        const activeTabElement = document.querySelector("#paymentTabs .nav-link.active");
+        const activeTabId = activeTabElement ? activeTabElement.id : 'card-tab';
+        const total = document.getElementById("summaryTotal").innerText;
+        const submitBtn = event.target.querySelector('button[type="submit"]') ||
+                           document.querySelector('.checkout-container button[type="submit"]');
+
+        // Validation for Card details if Card payment is selected.
+        // NOTE: card number/expiry/CVC are validated here for the user's
+        // convenience only -- they are intentionally never sent to the server
+        // or stored anywhere. Only the payment METHOD and outcome are persisted.
+        if (activeTabId === 'card-tab') {
+            const cardName = document.getElementById("cardName").value.trim();
+            const cardNumber = document.getElementById("cardNumber").value.trim();
+            const cardExpiry = document.getElementById("cardExpiry").value.trim();
+            const cardCvc = document.getElementById("cardCvc").value.trim();
+
+            if (!cardName || !cardNumber || !cardExpiry || !cardCvc) {
+                alert("Please fill in all card details before proceeding.");
+                return; // Block execution if fields are empty
+            }
+        }
+
+        const currentPayload = JSON.parse(localStorage.getItem("checkoutOrderPayload")) || { items: [], totalAmount: "0.00" };
+        currentPayload.paymentMethod = activeTabId === 'card-tab' ? 'Credit/Debit Card' : 'Counter Cash';
+
+        if (!currentPayload.customerPhone) {
+            currentPayload.customerPhone = "0712345678";
+        }
+
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "Processing..."; }
+
+        try {
+            const res = await fetch('api/customer/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    items: currentPayload.items,
+                    paymentMethod: currentPayload.paymentMethod
+                })
+            });
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || "Payment could not be processed.");
+            }
+
+            // Store the real, server-assigned order id -- this is what
+            // deliver.html and print.html will reference from here on.
+            currentPayload.orderId = data.orderId;
+            localStorage.setItem("checkoutOrderPayload", JSON.stringify(currentPayload));
+
+            alert(`Transaction Verified Successfully via ${currentPayload.paymentMethod}.\nTotal Processed: ${total}`);
+
+            // Redirect to Delivery Dispatch page
+            window.location.href = 'deliver.html';
+
+        } catch (err) {
+            alert(`Payment failed: ${err.message}`);
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "Authorize Payment"; }
+        }
+    }
+</script>
+</body>
+</html>
+
+

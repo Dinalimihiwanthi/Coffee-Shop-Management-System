@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+    <!--
+        JNDI DataSource for coffee_shop_db.
+        Update username/password to match your local MySQL/MariaDB setup.
+        Requires the MySQL Connector/J jar added to the project's Libraries.
+    -->
+    <Resource name="jdbc/coffeeshopDB"
+              auth="Container"
+              type="javax.sql.DataSource"
+              maxTotal="20"
+              maxIdle="10"
+              maxWaitMillis="10000"
+              username="root"
+              password=""
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/coffee_shop_db?useSSL=false&amp;serverTimezone=UTC" />
+
+</Context>

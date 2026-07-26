@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse & Inventory Portal | DP COFFEE SHOP</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #2c1b18;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+        body {
+            background-color: var(--coffee-light);
+            color: var(--coffee-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .navbar-custom {
+            background-color: var(--coffee-dark);
+            border-bottom: 3px solid var(--coffee-accent);
+        }
+        .card-custom {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .btn-coffee {
+            background-color: var(--coffee-accent);
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: var(--coffee-dark);
+            color: white;
+        }
+        .badge-warehouse {
+            background-color: #6c757d;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4 py-3 shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+                <i class="bi bi-boxes"></i> DP COFFEE SHOP — Warehouse & Stock Portal
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge badge-warehouse p-2 d-flex align-items-center gap-1">
+                    <i class="bi bi-person-badge"></i> ROLE: WAREHOUSE STAFF
+                </span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm rounded-2">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container my-4">
+
+        <!-- Global Status Notification Banner -->
+        <div id="statusAlert" class="alert d-none text-center alert-dismissible fade show" role="alert">
+            <span id="alertMessage"></span>
+            <button type="button" class="btn-close" onclick="hideAlert()" aria-label="Close"></button>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Total Inventory SKUs</small>
+                        <h3 class="fw-bold mb-0 text-dark" id="totalSkuCount">0</h3>
+                    </div>
+                    <i class="bi bi-box-seam text-secondary fs-1"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Low Stock Warning</small>
+                        <h3 class="fw-bold mb-0 text-warning" id="lowStockCount">0</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Out of Stock</small>
+                        <h3 class="fw-bold mb-0 text-danger" id="outStockCount">0</h3>
+                    </div>
+                    <i class="bi bi-x-circle-fill text-danger fs-1"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace Row -->
+        <div class="row g-4">
+            
+           
+
+            <!-- RIGHT COLUMN: Stock Audit Table -->
+            <div class="col-lg-12">
+                <div class="card-custom p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-clipboard-data me-2"></i>Live Inventory Stock</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="stockSearch" onkeyup="filterStockTable()" class="form-control form-control-sm" placeholder="Search item...">
+                            <button onclick="fetchInventory()" class="btn btn-coffee btn-sm rounded-2 text-nowrap">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Item Name</th>
+                                    <th>Category</th>
+                                    <th class="text-center">Current Quantity</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <!-- JavaScript populates stock list -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Warehouse JavaScript Module -->
+    <script>
+        const API_STOCK_ENDPOINT = "api/menu/stock";
+
+        let inventoryItems = [];
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("jwtToken");
+            return {
+                "Content-Type": "application/json",
+                "Authorization": token ? `Bearer ${token}` : ""
+            };
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchInventory();
+        });
+
+        // 1. Fetch Inventory List
+        async function fetchInventory() {
+            try {
+                const res = await fetch(API_STOCK_ENDPOINT, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                inventoryItems = await res.json();
+                renderStockTable(inventoryItems);
+                updateMetrics(inventoryItems);
+            } catch (err) {
+                showAlert(`Inventory load error: ${err.message}`, "danger");
+            }
+        }
+
+        // 2. Render Stock Table
+        function renderStockTable(items) {
+            const tbody = document.getElementById("inventoryTableBody");
+            tbody.innerHTML = "";
+
+            if (items.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No inventory records found.</td></tr>`;
+                return;
+            }
+
+            items.forEach(item => {
+                let badge = `<span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">Optimal</span>`;
+                let color = "text-success";
+
+                if (item.stockQuantity <= 0) {
+                    badge = `<span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">Out of Stock</span>`;
+                    color = "text-danger";
+                } else if (item.stockQuantity <= 5) {
+                    badge = `<span class="badge bg-warning-subtle text-warning px-3 py-2 rounded-pill">Low Stock</span>`;
+                    color = "text-warning";
+                }
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><span class="badge bg-secondary">${escapeHtml(item.itemId || '')}</span></td>
+                    <td class="fw-bold">${escapeHtml(item.itemName || '')}</td>
+                    <td><span class="badge bg-light text-dark border">${escapeHtml(item.category || 'General')}</span></td>
+                    <td class="text-center fw-bold fs-6 ${color}">${item.stockQuantity ?? 0} units</td>
+                    <td class="text-center">${badge}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+      
+
+        // 4. Update Header Counter Cards
+        function updateMetrics(items) {
+            let low = 0, out = 0;
+            items.forEach(i => {
+                if (i.stockQuantity <= 0) out++;
+                else if (i.stockQuantity <= 5) low++;
+            });
+
+            document.getElementById("totalSkuCount").innerText = items.length;
+            document.getElementById("lowStockCount").innerText = low;
+            document.getElementById("outStockCount").innerText = out;
+        }
+
+        // 5. Search Filter Functionality
+        function filterStockTable() {
+            const term = document.getElementById("stockSearch").value.toLowerCase();
+            const filtered = inventoryItems.filter(i =>
+                (i.itemName && i.itemName.toLowerCase().includes(term)) ||
+                (i.itemId && i.itemId.toLowerCase().includes(term)) ||
+                (i.category && i.category.toLowerCase().includes(term))
+            );
+            renderStockTable(filtered);
+        }
+
+        function showAlert(msg, type) {
+            const container = document.getElementById('statusAlert');
+            const targetSpan = document.getElementById('alertMessage');
+            container.className = `alert alert-${type} text-center alert-dismissible fade show`;
+            targetSpan.innerText = msg;
+            setTimeout(() => hideAlert(), 3500);
+        }
+
+        function hideAlert() {
+            document.getElementById('statusAlert').classList.add('d-none');
+        }
+
+        function logout() {
+            localStorage.removeItem("jwtToken");
+            window.location.href = "index.html";
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

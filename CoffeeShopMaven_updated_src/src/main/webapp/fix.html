@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Gateway | DP COFFEE SHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #1e110f;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+        body {
+            background-color: var(--coffee-light);
+            color: var(--coffee-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .hero-header {
+            background-color: var(--coffee-dark);
+            color: white;
+            border-bottom: 4px solid var(--coffee-accent);
+            padding: 3rem 1rem 2.5rem;
+            text-align: center;
+        }
+        .role-card {
+            background: white;
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .role-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+        .icon-circle {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1rem;
+        }
+        .btn-role {
+            font-weight: 600;
+            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero-header shadow-sm">
+        <div class="container">
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+                
+                <h1 class="fw-bold mb-0"> <i class="bi bi-shop"></i>DP COFFEE SHOP</h1>
+            </div>
+            <p class="text-white-50 lead fs-6 mb-0">Enterprise Management System & Staff Terminal Gateway</p>
+        </div>
+    </header>
+
+    <main class="container my-auto py-5">
+        
+        <div class="text-center mb-5">
+            <h3 class="fw-bold">Select System Portal</h3>
+            <p class="text-muted small">Choose your staff role to enter the corresponding workspace or login page.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="role-card p-4 text-center border-top border-4 border-danger">
+                    <div>
+                        <div class="icon-circle bg-danger text-white">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Super Admin / Owner</h5>
+                        <p class="text-muted small mb-3">
+                            Full system authority: User provisioning, role assignment, executive reports, and audit logs.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="admin_login.html" class="btn btn-danger btn-role mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Admin Login
+                      
+                          </a>
+                        
+                    </div>
+
+          
+
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="role-card p-4 text-center border-top border-4 border-primary">
+                    <div>
+                        <div class="icon-circle bg-primary text-white">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Store Manager</h5>
+                        <p class="text-muted small mb-3">
+                            Daily store management: Staff monitoring, daily sales analytics, and supplier relations.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="manager_login.html" class="btn btn-primary btn-role mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Manager Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="role-card p-4 text-center border-top border-4 border-success">
+                    <div>
+                        <div class="icon-circle bg-success text-white">
+                            <i class="bi bi-calculator-fill"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Cashier / POS Operator</h5>
+                        <p class="text-muted small mb-3">
+                            Point of Sale terminal: Rapid order entry, receipt calculation, and payment collection.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="pos_cashier_login.html" class="btn btn-success btn-role mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> POS Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="role-card p-4 text-center border-top border-4 border-warning">
+                    <div>
+                        <div class="icon-circle bg-warning text-dark">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Barista / Kitchen Staff</h5>
+                        <p class="text-muted small mb-3">
+                            Kitchen Display System (KDS): Real-time live order processing queue and status updates.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="barista_kds_login.html" class="btn btn-warning text-dark btn-role mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Kitchen Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="role-card p-4 text-center border-top border-4 border-secondary">
+                    <div>
+                        <div class="icon-circle bg-secondary text-white">
+                            <i class="bi bi-boxes"></i>
+                        </div>
+                        <h5 class="fw-bold mb-1">Warehouse / Inventory</h5>
+                        <p class="text-muted small mb-3">
+                            Inventory control: Raw ingredient stock audits, shipment ingestion, and adjustment logs.
+                        </p>
+                    </div>
+                    <div>
+                        <a href="warehouse_inventory_login.html" class="btn btn-secondary btn-role mb-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Stock Portal Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="text-center py-3 bg-white border-top mt-auto">
+        <small class="text-muted">
+            &copy; DP Coffee Shop Management System. All rights reserved.
+        </small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

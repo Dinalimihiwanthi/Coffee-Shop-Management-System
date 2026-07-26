@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Terminal | DP COFFEE SHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #2c1b18;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+        body {
+            background-color: var(--coffee-light);
+            color: var(--coffee-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .navbar-custom {
+            background-color: var(--coffee-dark);
+            border-bottom: 3px solid var(--coffee-accent);
+        }
+        .card-custom {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .item-card {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            border: 2px solid transparent;
+        }
+        .item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            border-color: var(--coffee-accent);
+        }
+        .btn-coffee {
+            background-color: var(--coffee-accent);
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: var(--coffee-dark);
+            color: white;
+        }
+        .order-summary-box {
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-items-container {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .badge-cashier {
+            background-color: #198754;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4 py-2 shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+                <i class="bi bi-calculator"></i> DP COFFEE SHOP — POS Cashier Terminal
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge badge-cashier p-2 d-flex align-items-center gap-1">
+                    <i class="bi bi-person-badge"></i> ROLE: CASHIER
+                </span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm rounded-2">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3 px-4">
+        
+        <!-- Status Toast Banner -->
+        <div id="statusAlert" class="alert d-none text-center alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3 z-3 shadow" role="alert">
+            <span id="alertMessage"></span>
+            <button type="button" class="btn-close" onclick="hideAlert()" aria-label="Close"></button>
+        </div>
+
+        <div class="row g-3">
+            
+            <!-- LEFT COLUMN: Menu Selection Grid -->
+            <div class="col-lg-7 col-xl-8">
+                <div class="card-custom p-3 h-100">
+                    <!-- Search & Filter Controls -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                            <input type="text" id="menuSearch" onkeyup="filterMenu()" class="form-control" placeholder="Search item or scan code...">
+                        </div>
+                        <button onclick="fetchMenuItems()" class="btn btn-outline-secondary text-nowrap">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Visual Menu Item Cards Container -->
+                    <div class="row g-3 overflow-y-auto" style="max-height: calc(100vh - 200px);" id="menuGrid">
+                        <!-- JavaScript dynamically populates item tiles -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Current Order & Checkout Panel -->
+            <div class="col-lg-5 col-xl-4">
+                <div class="card-custom p-3 order-summary-box">
+                    
+                    <div class="d-flex justify-content-between align-items-center pb-2 border-bottom">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-receipt me-2"></i>Current Order</h5>
+                        <button onclick="clearCart()" class="btn btn-sm btn-outline-danger">Clear All</button>
+                    </div>
+
+                    <!-- Cart Items List -->
+                    <div class="cart-items-container my-3" id="cartContainer">
+                        <div class="text-center text-muted py-5" id="emptyCartMsg">
+                            <i class="bi bi-cart-x fs-1 d-block mb-2"></i>
+                            No items added yet. Click items on the left to start order.
+                        </div>
+                        <ul class="list-group list-group-flush" id="cartList"></ul>
+                    </div>
+
+                    <!-- Order Total Calculation & Actions -->
+                    <div class="pt-3 border-top bg-white">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Subtotal</span>
+                            <span class="fw-semibold" id="subtotalText">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tax (8%)</span>
+                            <span class="fw-semibold" id="taxText">$0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                            <span class="fw-bold fs-5">Total Amount</span>
+                            <span class="fw-bold fs-5 text-success" id="totalText">$0.00</span>
+                        </div>
+
+                     
+                        <button onclick="processCheckout()" id="checkoutBtn" class="btn btn-coffee w-100 py-2 fs-6 fw-bold" disabled>
+                        </button>
+                    </div>
+                
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API = {
+            MENU: "api/menu/stock",
+            CHECKOUT: "api/orders"
+        };
+
+        let menuData = [];
+        let cart = [];
+
+        function getAuthHeaders() {
+            const token = localStorage.getItem("jwtToken");
+            return {
+                "Content-Type": "application/json",
+                "Authorization": token ? `Bearer ${token}` : ""
+            };
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchMenuItems();
+        });
+
+        // 1. Fetch available stock/menu items
+        async function fetchMenuItems() {
+            try {
+                const res = await fetch(API.MENU, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                menuData = await res.json();
+                renderMenuGrid(menuData);
+            } catch (err) {
+                showAlert(`Failed to load menu: ${err.message}`, "danger");
+            }
+        }
+
+        // 2. Render clickable menu item tiles
+        function renderMenuGrid(items) {
+            const grid = document.getElementById("menuGrid");
+            grid.innerHTML = "";
+
+            items.forEach(item => {
+                const isOutOfStock = (item.stockQuantity <= 0);
+                const col = document.createElement("div");
+                col.className = "col-6 col-md-4 col-xl-3";
+                
+                col.innerHTML = `
+                    <div class="card h-100 item-card ${isOutOfStock ? 'opacity-50' : ''}" 
+                         onclick="${isOutOfStock ? '' : `addToCart('${item.itemId}')`}">
+                        <div class="card-body p-2 text-center d-flex flex-column justify-content-between">
+                            <div>
+                                <span class="badge bg-light text-dark border mb-1">${escapeHtml(item.category || 'Menu')}</span>
+                                <h6 class="fw-bold mb-1 text-truncate">${escapeHtml(item.itemName || '')}</h6>
+                            </div>
+                            <div class="mt-2">
+                                <span class="fw-bold text-success">$${Number(item.price || 0).toFixed(2)}</span>
+                                <div class="small ${isOutOfStock ? 'text-danger fw-bold' : 'text-muted'}">
+                                    ${isOutOfStock ? 'Sold Out' : item.stockQuantity + ' left'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(col);
+            });
+        }
+
+        // 3. Add Item to Cart
+        function addToCart(itemId) {
+            const item = menuData.find(i => i.itemId === itemId);
+            if (!item) return;
+
+            const existing = cart.find(c => c.itemId === itemId);
+            if (existing) {
+                if (existing.qty < item.stockQuantity) {
+                    existing.qty++;
+                } else {
+                    showAlert(`Cannot exceed remaining stock limit (${item.stockQuantity} available).`, "warning");
+                    return;
+                }
+            } else {
+                cart.push({ itemId: item.itemId, name: item.itemName, price: item.price, qty: 1, maxStock: item.stockQuantity });
+            }
+            updateCartUI();
+        }
+
+        // 4. Update Cart & Calculation Display
+        function updateCartUI() {
+            const cartList = document.getElementById("cartList");
+            const emptyMsg = document.getElementById("emptyCartMsg");
+            const checkoutBtn = document.getElementById("checkoutBtn");
+
+            cartList.innerHTML = "";
+
+            if (cart.length === 0) {
+                emptyMsg.classList.remove("d-none");
+                checkoutBtn.disabled = true;
+                calculateTotals(0);
+                return;
+            }
+
+            emptyMsg.classList.add("d-none");
+            checkoutBtn.disabled = false;
+
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.qty;
+                subtotal += itemTotal;
+
+                const li = document.createElement("li");
+                li.className = "list-group-item d-flex justify-content-between align-items-center px-0 py-2";
+                li.innerHTML = `
+                    <div class="me-auto me-2 text-truncate">
+                        <div class="fw-bold small text-truncate">${escapeHtml(item.name)}</div>
+                        <div class="text-muted small">$${item.price.toFixed(2)} each</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <button onclick="changeQty(${index}, -1)" class="btn btn-sm btn-outline-secondary px-2 py-0">-</button>
+                        <span class="fw-bold px-1 small">${item.qty}</span>
+                        <button onclick="changeQty(${index}, 1)" class="btn btn-sm btn-outline-secondary px-2 py-0">+</button>
+                    </div>
+                    <span class="fw-bold ms-3 small">$${itemTotal.toFixed(2)}</span>
+                `;
+                cartList.appendChild(li);
+            });
+
+            calculateTotals(subtotal);
+        }
+
+        function changeQty(index, delta) {
+            const item = cart[index];
+            item.qty += delta;
+            
+            if (item.qty > item.maxStock) {
+                item.qty = item.maxStock;
+                showAlert("Stock limit reached.", "warning");
+            }
+
+            if (item.qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartUI();
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCartUI();
+        }
+
+        function calculateTotals(subtotal) {
+            const tax = subtotal * 0.08;
+            const total = subtotal + tax;
+
+            document.getElementById("subtotalText").innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById("taxText").innerText = `$${tax.toFixed(2)}`;
+            document.getElementById("totalText").innerText = `$${total.toFixed(2)}`;
+        }
+
+        // 5. Submit Order to Java Backend
+        async function processCheckout() {
+            if (cart.length === 0) return;
+
+            const selectedPayment = document.querySelector('input[name="payMethod"]:checked').value;
+            
+            const payload = {
+                paymentMethod: selectedPayment,
+                items: cart.map(c => ({ itemId: c.itemId, quantity: c.qty, unitPrice: c.price }))
+            };
+
+            try {
+                const res = await fetch(API.CHECKOUT, {
+                    method: "POST",
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+
+                showAlert("Order submitted & sent to kitchen queue!", "success");
+                clearCart();
+                fetchMenuItems(); // Refresh stock metrics automatically
+
+            } catch (err) {
+                showAlert(`Checkout failure: ${err.message}`, "danger");
+            }
+        }
+
+        function filterMenu() {
+            const term = document.getElementById("menuSearch").value.toLowerCase();
+            const filtered = menuData.filter(i => 
+                i.itemName.toLowerCase().includes(term) || 
+                i.category.toLowerCase().includes(term)
+            );
+            renderMenuGrid(filtered);
+        }
+
+        function showAlert(msg, type) {
+            const container = document.getElementById('statusAlert');
+            const targetSpan = document.getElementById('alertMessage');
+            container.className = `alert alert-${type} text-center alert-dismissible fade show position-absolute top-0 start-50 translate-middle-x mt-3 z-3 shadow`;
+            targetSpan.innerText = msg;
+            setTimeout(() => hideAlert(), 3000);
+        }
+
+        function hideAlert() {
+            document.getElementById('statusAlert').classList.add('d-none');
+        }
+
+        function logout() {
+            localStorage.removeItem("jwtToken");
+            window.location.href = "index.html";
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

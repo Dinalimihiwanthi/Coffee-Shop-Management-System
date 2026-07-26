@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to DP COFFEE SHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #2c1b18;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hero-bg {
+            background: linear-gradient(rgba(20, 10, 8, 0.78), rgba(20, 10, 8, 0.88)), 
+                        url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .navbar-brand-custom {
+            color: #ffffff;
+            font-size: 1.6rem;
+            text-decoration: none;
+        }
+
+        .btn-about-nav {
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.08);
+            font-weight: 600;
+            font-size: 1.15rem;
+            border-radius: 35px;
+            padding: 0.8rem 1.8rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-about-nav:hover {
+            background-color: #ffffff;
+            border-color: #ffffff;
+            color: var(--coffee-dark);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-signup-nav {
+            border: 2px solid var(--coffee-accent);
+            color: #ffffff;
+            background-color: var(--coffee-accent);
+            font-weight: 700;
+            font-size: 1.15rem;
+            border-radius: 35px;
+            padding: 0.8rem 2.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(140, 98, 57, 0.5);
+        }
+
+        .btn-signup-nav:hover {
+            background-color: #a67545;
+            border-color: #a67545;
+            color: #ffffff;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 6px 20px rgba(140, 98, 57, 0.7);
+        }
+
+        .login-card {
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border-color: var(--coffee-accent);
+        }
+
+        .card-img-bg {
+            height: 220px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-img-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(20, 10, 8, 0.5) 0%, rgba(20, 10, 8, 0.85) 100%);
+            transition: all 0.3s ease;
+        }
+
+        .login-card:hover .card-img-bg::before {
+            background: linear-gradient(180deg, rgba(20, 10, 8, 0.3) 0%, rgba(20, 10, 8, 0.75) 100%);
+        }
+
+
+        .customer-bg {
+            background-image: url('https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=800&auto=format&fit=crop');
+        }
+
+        .admin-bg {
+            background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=800&auto=format&fit=crop');
+        }
+
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            background-color: var(--coffee-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .login-card:hover .icon-circle {
+            background-color: #ffffff;
+            color: var(--coffee-dark);
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-bg p-4 p-md-5">
+
+
+        <header class="container-fluid d-flex justify-content-between align-items-center">
+            <a href="#" class="navbar-brand-custom fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-shop"></i> DP COFFEE SHOP
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <a href="about_us.html" class="btn btn-about-nav d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle-fill fs-5"></i> About Us
+                </a>
+
+                <a href="sign_up.html" class="btn btn-signup-nav d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-person-plus-fill fs-5"></i> Sign Up
+                </a>
+            </div>
+        </header>
+
+        <section class="container text-center my-auto py-4">
+            <h1 class="display-3 fw-bold text-white mb-2">DP Coffee Shop</h1>
+            <p class="lead text-light opacity-75 max-width-600 mx-auto fs-4">
+                Welcome to DP Coffee Shop Portal. Select your portal to proceed.
+            </p>
+        </section>
+
+        <footer class="container pb-3">
+            <div class="row g-4 justify-content-center">
+                
+                <div class="col-md-5 col-lg-4">
+                    <a href="customer_login.html" class="login-card">
+                        <div class="card-img-bg customer-bg">
+                            <div class="card-content text-center p-3">
+                                <div class="icon-circle mx-auto">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <h3 class="fw-bold mb-1">Customer Login</h3>
+                                <p class="small text-light opacity-75 mb-0">Order coffee & manage membership</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-5 col-lg-4">
+                    <a href="fix.html" class="login-card">
+                        <div class="card-img-bg admin-bg">
+                            <div class="card-content text-center p-3">
+                                <div class="icon-circle mx-auto">
+                                    <i class="bi bi-shield-lock-fill"></i>
+                                </div>
+                                <h3 class="fw-bold mb-1">Admin Login</h3>
+                                <p class="small text-light opacity-75 mb-0">Manage inventory & supplier systems</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

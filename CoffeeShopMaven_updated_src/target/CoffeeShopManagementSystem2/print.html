@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Receipt | POS Terminal</title>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --coffee-dark: #1c0d02;
+            --coffee-medium: #3d2314;
+        }
+
+        body {
+            background: linear-gradient(rgba(18, 10, 8, 0.80), rgba(18, 10, 8, 0.85)), 
+                        url('https://images.unsplash.com/photo-1517256064527-09c73fc73e38?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover fixed;
+            font-family: 'Courier New', Courier, monospace;
+            color: #000;
+            padding: 30px 15px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .receipt-ticket {
+            background: #fff;
+            width: 90mm;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        /* Dashboard-style Top Right Logout Button */
+        .logout-btn-top {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #dc3545;
+            color: #ffffff;
+            border: 1px solid #dc3545;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .logout-btn-top:hover {
+            background: #bb2d3b;
+            border-color: #b02a37;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        
+        .brand-header {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 4px;
+        }
+
+        .sub-header {
+            font-size: 0.95rem;
+        }
+
+        .divider {
+            border-top: 1px dashed #000;
+            margin: 12px 0;
+        }
+
+        .meta-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+        }
+
+        .phone-highlight-box {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 8px;
+            margin: 12px 0;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        .item-table {
+            width: 100%;
+            font-size: 0.95rem;
+            border-collapse: collapse;
+        }
+
+        .item-table th {
+            border-bottom: 1px solid #000;
+            text-align: left;
+            padding-bottom: 6px;
+            font-size: 1rem;
+        }
+
+        .item-table td {
+            padding: 8px 0;
+        }
+
+        .total-row {
+            font-size: 1.35rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .no-print-actions {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .btn-action {
+            padding: 10px 22px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin: 0 6px;
+            border-radius: 6px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+
+        @media print {
+            body { 
+                background: #fff; 
+                padding: 0; 
+            }
+            .receipt-ticket { 
+                border: none; 
+                box-shadow: none; 
+                width: 100%; 
+                padding: 0;
+            }
+            .no-print-actions, .logout-btn-top { 
+                display: none !important; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="receipt-ticket">
+    
+    <!-- Dashboard-Style Top Right Logout Button -->
+    <a href="deliver.html" class="logout-btn-top" onclick="handleLogout(event)">
+        <i class="bi bi-box-arrow-right" style="margin-right: 5px;"></i> Back
+    </a>
+
+    <a href="index.html" class="logout-btn-top" onclick="handleLogout(event)">
+        <i class="bi bi-box-arrow-right" style="margin-right: 5px;"></i> Logout
+    </a>
+
+    <div class="text-center">
+        <div class="brand-header">DP COFFEE SHOP</div>
+        <div class="sub-header">Terminal Invoice Receipt</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="meta-info-row">
+        <span>Invoice #:</span>
+        <span id="receiptOrderId">--</span>
+    </div>
+    <div class="meta-info-row">
+        <span>Date:</span>
+        <span id="receiptDate">--/--/----</span>
+    </div>
+    <div class="meta-info-row">
+        <span>Time:</span>
+        <span id="receiptTime">--:--</span>
+    </div>
+    <!-- DISPLAY SELECTED DELIVERY METHOD -->
+    <div class="meta-info-row">
+        <span>Dispatch Mode:</span>
+        <strong id="receiptDeliveryMethod">N/A</strong>
+    </div>
+
+    <!-- CLEAN OUTPUT DISPLAY FOR SIGNUP PHONE NUMBER -->
+    <div class="phone-highlight-box">
+        <strong>CUSTOMER PHONE:</strong><br>
+        <span id="targetReceiptPhone">Loading...</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <table class="item-table">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th class="text-right">Price</th>
+            </tr>
+        </thead>
+        <tbody id="receiptItemsContainer"></tbody>
+    </table>
+
+    <div class="divider"></div>
+
+    <div class="total-row">
+        <span>TOTAL:</span>
+        <span id="targetReceiptTotal">Rs. 0.00</span>
+    </div>
+
+    <div class="divider" style="margin-top: 20px;"></div>
+    <div class="text-center" style="font-size: 0.9rem; margin-top: 10px;">
+        Thank You for Your Order!<br>Come Back Soon.
+    </div>
+</div>
+
+<div class="no-print-actions">
+    <button class="btn-action" onclick="window.print()" style="background: #28a745; color: #fff; border: none;">Print Invoice</button>
+</div>
+
+<script>
+    function handleLogout(event) {
+        event.preventDefault();
+        // Clear session payload on logout if needed
+        localStorage.removeItem("checkoutOrderPayload");
+        localStorage.removeItem("selectedDeliveryMethod");
+        // Redirect to login page
+        window.location.href = 'index.html';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Retrieve selected delivery method passed from delivery.html
+        const selectedDeliveryMethod = localStorage.getItem("selectedDeliveryMethod");
+        if (selectedDeliveryMethod) {
+            document.getElementById("receiptDeliveryMethod").innerText = selectedDeliveryMethod;
+        }
+
+        const rawPayload = localStorage.getItem("checkoutOrderPayload");
+
+        if (!rawPayload) {
+            alert("No checkout payload active.");
+            window.location.href = 'menu.html';
+            return;
+        }
+
+        const orderData = JSON.parse(rawPayload);
+
+        if (!orderData.orderId) {
+            alert("This order was never confirmed with payment. Redirecting to checkout.");
+            window.location.href = 'pay.html';
+            return;
+        }
+
+        // Real, server-assigned order id -- this order and its payment/delivery
+        // rows already exist in the database at this point.
+        document.getElementById("receiptOrderId").innerText = `#${orderData.orderId}`;
+
+        // Render the phone number grabbed from session data
+        document.getElementById("targetReceiptPhone").innerText = orderData.customerPhone || "N/A";
+        
+        // Handle numerical/string representation for total display
+        const totalVal = parseFloat(orderData.totalAmount || orderData.total || 0).toFixed(2);
+        document.getElementById("targetReceiptTotal").innerText = `Rs. ${totalVal}`;
+
+        const now = new Date();
+        document.getElementById("receiptDate").innerText = now.toLocaleDateString();
+        document.getElementById("receiptTime").innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        const container = document.getElementById("receiptItemsContainer");
+        container.innerHTML = ""; 
+
+        if (orderData.items && orderData.items.length > 0) {
+            orderData.items.forEach(item => {
+                const itemName = item.name || item.title || 'Item';
+                const itemPrice = parseFloat(item.price || 0).toFixed(2);
+                
+                const row = `
+                    <tr>
+                        <td>${itemName}</td>
+                        <td class="text-right">Rs. ${itemPrice}</td>
+                    </tr>
+                `;
+                container.insertAdjacentHTML('beforeend', row);
+            });
+        } else {
+            container.innerHTML = `<tr><td colspan="2" class="text-center">No items listed</td></tr>`;
+        }
+    });
+</script>
+</body>
+</html>

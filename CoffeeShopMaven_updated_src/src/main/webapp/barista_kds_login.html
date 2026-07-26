@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barista & KDS Login | DP COFFEE SHOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #2c1b18;
+            --coffee-accent: #8c6239;
+        }
+        body {
+            background-color: #121212;
+            background: linear-gradient(rgba(15, 8, 7, 0.78), rgba(15, 8, 7, 0.85)), 
+                        url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1920&auto=format&fit=crop') no-repeat center center/cover fixed;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background-color: #1e1e1e;
+            border: 1px solid #333333;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden;
+        }
+        .login-header {
+            background-color: var(--coffee-dark);
+            color: white;
+            border-bottom: 4px solid #fd7e14; 
+            padding: 2rem 2rem 1.5rem;
+            text-align: center;
+        }
+        .btn-barista {
+            background-color: #fd7e14;
+            color: white;
+            padding: 0.75rem;
+            font-weight: 700;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        .btn-barista:hover {
+            background-color: #e06800;
+            color: white;
+        }
+        .badge-barista {
+            background-color: #fd7e14;
+            color: #121212;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+        .form-control {
+            background-color: #2b2b2b;
+            border-color: #444444;
+            color: #ffffff;
+        }
+        .form-control:focus {
+            background-color: #333333;
+            border-color: #fd7e14;
+            color: #ffffff;
+            box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25);
+        }
+        .input-group-text {
+            background-color: #2b2b2b;
+            border-color: #444444;
+            color: #aaaaaa;
+        }
+        .numpad-btn {
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 0.8rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="mb-2">
+                <i class="bi bi-cup-hot-fill fs-1 text-warning"></i>
+            </div>
+            <h4 class="fw-bold mb-1">DP COFFEE SHOP</h4>
+            <p class="text-white-50 small mb-2">Kitchen Display System (KDS)</p>
+            <span class="badge badge-barista p-2">
+                <i class="bi bi-fire me-1"></i> BARISTA & KITCHEN ACCESS
+            </span>
+        </div>
+
+        <div class="p-4">
+            
+            <div id="errorAlert" class="alert alert-danger d-none text-center small p-2 mb-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                <span id="errorMessage">Invalid kitchen credentials.</span>
+            </div>
+
+            <form id="kdsLoginForm" onsubmit="handleKdsLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-light">Barista ID / Staff Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" id="username" class="form-control" placeholder="e.g., barista_01" required autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label class="form-label small fw-semibold text-light">Password / PIN</label>
+                        <button type="button" class="btn btn-link btn-sm text-warning text-decoration-none p-0 mb-1" onclick="toggleNumpad()">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i>Toggle Touch Numpad
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <input type="password" id="password" class="form-control" placeholder="Enter password or PIN" required>
+                    </div>
+                </div>
+
+                <div id="numpadContainer" class="d-none mb-3 p-3 rounded-3 border border-secondary" style="background-color: #252525;">
+                    <div class="row g-2">
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('1')">1</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('2')">2</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('3')">3</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('4')">4</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('5')">5</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('6')">6</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('7')">7</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('8')">8</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('9')">9</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-danger w-100 numpad-btn" onclick="clearPin()">C</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-light w-100 numpad-btn" onclick="appendPin('0')">0</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-warning w-100 numpad-btn" onclick="backspacePin()"><i class="bi bi-backspace"></i></button></div>
+                    </div>
+                </div>
+
+                <button type="submit" id="loginBtn" class="btn btn-barista w-100 mb-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Open Kitchen Queue
+                </button>
+            </form>
+            
+        </div>
+    </div>
+
+    
+    <script>
+        const AUTH_API = "api/auth/login";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("jwtToken");
+            const userRole = localStorage.getItem("userRole");
+            
+            if (token && (userRole === "ROLE_KITCHEN_STAFF" || userRole === "ROLE_MANAGER" || userRole === "ROLE_ADMIN")) {
+                window.location.href = "barista_kds.html";
+            }
+        });
+
+        async function handleKdsLogin(e) {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById("username").value.trim();
+            const passwordInput = document.getElementById("password").value;
+            const loginBtn = document.getElementById("loginBtn");
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Connecting to KDS...`;
+            hideError();
+
+            const payload = {
+                username: usernameInput,
+                password: passwordInput
+            };
+
+            try {
+                const response = await fetch(AUTH_API, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error("Invalid barista username or PIN.");
+                }
+
+                const data = await response.json();
+
+                if (data.role !== "ROLE_KITCHEN_STAFF" && data.role !== "ROLE_MANAGER" && data.role !== "ROLE_ADMIN") {
+                    throw new Error("Access Denied: Account lacks Kitchen Terminal authority.");
+                }
+
+                localStorage.setItem("jwtToken", data.token);
+                localStorage.setItem("userRole", data.role);
+                localStorage.setItem("username", data.username);
+
+                window.location.href = "barista_kds.html";
+
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = `<i class="bi bi-box-arrow-in-right me-1"></i> Open Kitchen Queue`;
+            }
+        }
+
+        function toggleNumpad() {
+            const pad = document.getElementById("numpadContainer");
+            pad.classList.toggle("d-none");
+        }
+
+        function appendPin(val) {
+            const pwdField = document.getElementById("password");
+            pwdField.value += val;
+        }
+
+        function clearPin() {
+            document.getElementById("password").value = "";
+        }
+
+        function backspacePin() {
+            const pwdField = document.getElementById("password");
+            pwdField.value = pwdField.value.slice(0, -1);
+        }
+
+        function showError(message) {
+            const alertBox = document.getElementById("errorAlert");
+            const messageSpan = document.getElementById("errorMessage");
+            messageSpan.innerText = message;
+            alertBox.classList.remove("d-none");
+        }
+
+        function hideError() {
+            document.getElementById("errorAlert").classList.add("d-none");
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
