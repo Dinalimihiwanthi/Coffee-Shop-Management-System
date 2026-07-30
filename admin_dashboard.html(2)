@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Portal | DP COFFEE SHOP</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --coffee-dark: #1e110f;
+            --coffee-accent: #8c6239;
+            --coffee-light: #f4f1ea;
+        }
+        body {
+            background-color: var(--coffee-light);
+            color: var(--coffee-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        .navbar-custom {
+            background-color: var(--coffee-dark);
+            border-bottom: 3px solid #dc3545; /* Red border to designate Super Admin privilege */
+        }
+        .card-custom {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+        .nav-pills .nav-link {
+            color: var(--coffee-dark);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+        }
+        .nav-pills .nav-link.active {
+            background-color: var(--coffee-dark);
+            color: white;
+        }
+        .btn-coffee {
+            background-color: var(--coffee-accent);
+            color: white;
+        }
+        .btn-coffee:hover {
+            background-color: var(--coffee-dark);
+            color: white;
+        }
+        .badge-admin {
+            background-color: #dc3545;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Executive Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-4 py-3 shadow-sm">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="#">
+                <i class="bi bi-shield-lock-fill text-danger"></i> DP COFFEE SHOP — Owner & Executive Portal
+            </a>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge badge-admin p-2 d-flex align-items-center gap-1">
+                    <i class="bi bi-star-fill"></i> ROLE: SUPER ADMIN / OWNER
+                </span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm rounded-2">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="container-fluid my-4 px-4">
+
+        <!-- Global Status Notification Banner -->
+        <div id="statusAlert" class="alert d-none text-center alert-dismissible fade show" role="alert">
+            <span id="alertMessage"></span>
+            <button type="button" class="btn-close" onclick="hideAlert()" aria-label="Close"></button>
+        </div>
+
+        <!-- Executive Financial KPI Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between border-start border-4 border-success">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Total Sales (Today)</small>
+                        <h3 class="fw-bold mb-0 text-success" id="statTodaySales">$0.00</h3>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 text-success"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between border-start border-4 border-primary">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Total Orders</small>
+                        <h3 class="fw-bold mb-0 text-primary" id="statTotalOrders">0</h3>
+                    </div>
+                    <i class="bi bi-bag-check-fill fs-1 text-primary"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between border-start border-4 border-warning">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Active Staff</small>
+                        <h3 class="fw-bold mb-0 text-warning" id="statActiveStaff">0</h3>
+                    </div>
+                    <i class="bi bi-people-fill fs-1 text-warning"></i>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-3 bg-white rounded-3 shadow-sm d-flex align-items-center justify-content-between border-start border-4 border-danger">
+                    <div>
+                        <small class="text-muted text-uppercase fw-bold">Low Stock Items</small>
+                        <h3 class="fw-bold mb-0 text-danger" id="statLowStock">0</h3>
+                    </div>
+                    <i class="bi bi-exclamation-triangle-fill fs-1 text-danger"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Super Admin Tabs -->
+        <ul class="nav nav-pills mb-4 gap-2 bg-white p-2 rounded-3 shadow-sm justify-content-center" id="adminTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active d-flex align-items-center gap-2" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-pane" type="button">
+                    <i class="bi bi-shield-user"></i> User Access & Roles
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link d-flex align-items-center gap-2" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu-pane" type="button">
+                    <i class="bi bi-cup-hot"></i> Menu & Price Control
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link d-flex align-items-center gap-2" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales-pane" type="button">
+                    <i class="bi bi-graph-up-arrow"></i> Financial Reports
+                </button>
+            </li>
+            <!--
+            <li class="nav-item">
+                <button class="nav-link d-flex align-items-center gap-2" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit-pane" type="button">
+                    <i class="bi bi-journal-code"></i> System Audit Logs
+                </button>
+            </li>
+             -->
+        </ul>
+   
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="adminTabsContent">
+
+            <!-- ================= TAB 1: USER & ROLE MANAGEMENT ================= -->
+            <div class="tab-pane fade show active" id="users-pane">
+              <!-- <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="card-custom p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-person-plus-fill me-2"></i>Create System User</h5>
+                            <form id="userAccountForm" onsubmit="handleUserCreation(event)">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Username</label>
+                                    <input type="text" id="newUsername" class="form-control" placeholder="e.g., john_barista" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Temporary Password</label>
+                                    <input type="password" id="newPassword" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Assign Security Role</label>
+                                    <select id="newUserRole" class="form-select" required>
+                                        <option value="ROLE_CUSTOMER">ROLE_CUSTOMER</option>
+                                        <option value="ROLE_KITCHEN_STAFF">ROLE_KITCHEN_STAFF (Barista)</option>
+                                        <option value="ROLE_CASHIER">ROLE_CASHIER (POS)</option>
+                                        <option value="ROLE_WAREHOUSE_STAFF">ROLE_WAREHOUSE_STAFF</option>
+                                        <option value="ROLE_MANAGER">ROLE_MANAGER</option>
+                                        <option value="ROLE_ADMIN">ROLE_ADMIN (Super Admin)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-coffee w-100 fw-semibold">
+                                    <i class="bi bi-person-check-fill me-1"></i> Provision User Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                -->
+
+
+                    <div class="col-lg-12">
+                        <div class="card-custom p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i>Registered System Accounts</h5>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>User ID</th>
+                                            <th>Username</th>
+                                            <th>Assigned Role</th>
+                                            <th class="text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="userTableBody">
+                                        <!-- Javascript Populates Users -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            <!-- ================= TAB 2: GLOBAL MENU & PRICE CONTROL ================= -->
+            <div class="tab-pane fade" id="menu-pane">
+                <div class="row g-4">
+
+                    <!--
+                    <div class="col-lg-4">
+                        <div class="card-custom p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2"></i>Add / Update Menu Item</h5>
+                            <form id="menuItemForm" onsubmit="handleMenuItemSave(event)">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Item ID</label>
+                                    <input type="text" id="menuItemId" class="form-control" placeholder="ITEM-001" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Item Name</label>
+                                    <input type="text" id="menuItemName" class="form-control" placeholder="Espresso Single" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Category</label>
+                                    <input type="text" id="menuCategory" class="form-control" placeholder="Beverages" required>
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold">Price ($)</label>
+                                        <input type="number" step="0.01" id="menuPrice" class="form-control" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold">Initial Stock</label>
+                                        <input type="number" id="menuStock" class="form-control" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-coffee w-100 fw-semibold">
+                                    <i class="bi bi-save me-1"></i> Save Menu Item
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                -->
+
+
+
+                    <div class="col-lg-12">
+                        <div class="card-custom p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-cup-hot-fill me-2"></i>Active Master Menu</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>SKU ID</th>
+                                            <th>Item Name</th>
+                                            <th>Category</th>
+                                            <th class="text-end">Price</th>
+                                            <th class="text-center">Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="masterMenuTableBody">
+                                        <!-- JS populates Master Menu -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 3: FINANCIAL & SALES REPORTS ================= -->
+            <div class="tab-pane fade" id="sales-pane">
+                <div class="card-custom p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-bar-graph me-2"></i>Global Sales Ledger</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date & Time</th>
+                                    <th>Payment Method</th>
+                                    <th>Total Items</th>
+                                    <th class="text-end">Total Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesLedgerTableBody">
+                                <!-- JS Populates Sales Transactions -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= TAB 4: SYSTEM AUDIT LOGS ================= -->
+            <!--
+            <div class="tab-pane fade" id="audit-pane">
+                <div class="card-custom p-4">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-journal-text me-2"></i>Security & Action Logs</h5>
+                    <div class="bg-dark text-light p-3 rounded-3 font-monospace small" style="max-height: 400px; overflow-y: auto;" id="auditLogsContainer">
+                        <div>[SYSTEM INFO] Audit logger initialized...</div>
+                        <div>[AUTH SUCCESS] User 'admin' logged in with ROLE_ADMIN</div>
+                    </div>
+                </div>
+            </div>
+        -->
+
+        </div>
+    </main>
+
+    <!-- Super Admin JS Module -->
+    <script>
+        const API = {
+            USERS: "api/admin/users",
+            MENU: "api/menu/stock",
+            SALES: "api/admin/reports/sales",
+            STATS: "api/admin/stats"
+        };
+
+        // Auth is via the HttpSession cookie set at login (see AdminLoginServlet),
+        // not a JWT, so requests just need JSON headers.
+        function getAuthHeaders() {
+            return { "Content-Type": "application/json" };
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchDashboardStats();
+            fetchSystemUsers();
+            fetchMasterMenu();
+            fetchSalesReport();
+        });
+
+        // 1. Executive Summary Analytics
+        async function fetchDashboardStats() {
+            try {
+                const res = await fetch(API.STATS, { headers: getAuthHeaders() });
+                if (!res.ok) return;
+                const stats = await res.json();
+                
+                document.getElementById('statTodaySales').innerText = `$${Number(stats.todaySales || 0).toFixed(2)}`;
+                document.getElementById('statTotalOrders').innerText = stats.totalOrders || 0;
+                document.getElementById('statActiveStaff').innerText = stats.activeStaff || 0;
+                document.getElementById('statLowStock').innerText = stats.lowStockCount || 0;
+            } catch (err) {
+                console.error("Stats loading error:", err);
+            }
+        }
+
+        // 2. Provision & Read User Accounts
+        async function fetchSystemUsers() {
+            try {
+                const res = await fetch(API.USERS, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const users = await res.json();
+                
+                const tbody = document.getElementById('userTableBody');
+                tbody.innerHTML = "";
+                users.forEach(u => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><small class="text-muted">${u.userId || '-'}</small></td>
+                        <td class="fw-bold">${escapeHtml(u.username)}</td>
+                        <td><span class="badge bg-dark">${escapeHtml(u.role)}</span></td>
+                        <td class="text-center"><span class="badge bg-success">ACTIVE</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Failed to load user list:", err);
+            }
+        }
+
+        async function handleUserCreation(e) {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('newUsername').value,
+                password: document.getElementById('newPassword').value,
+                role: document.getElementById('newUserRole').value
+            };
+
+            try {
+                const res = await fetch(API.USERS, {
+                    method: "POST",
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                showAlert("User account provisioned successfully!", "success");
+                document.getElementById('userAccountForm').reset();
+                fetchSystemUsers();
+            } catch (err) {
+                showAlert(`Failed to create user: ${err.message}`, "danger");
+            }
+        }
+
+        // 3. Global Master Menu
+        async function fetchMasterMenu() {
+            try {
+                const res = await fetch(API.MENU, { headers: getAuthHeaders() });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                const items = await res.json();
+                
+                const tbody = document.getElementById('masterMenuTableBody');
+                tbody.innerHTML = "";
+                items.forEach(i => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="badge bg-secondary">${escapeHtml(i.itemId)}</span></td>
+                        <td class="fw-bold">${escapeHtml(i.itemName)}</td>
+                        <td><span class="badge bg-light text-dark border">${escapeHtml(i.category)}</span></td>
+                        <td class="text-end fw-semibold">$${Number(i.price).toFixed(2)}</td>
+                        <td class="text-center fw-bold">${i.stockQuantity}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Master menu error:", err);
+            }
+        }
+
+        async function handleMenuItemSave(e) {
+            e.preventDefault();
+            const payload = {
+                itemId: document.getElementById('menuItemId').value,
+                itemName: document.getElementById('menuItemName').value,
+                category: document.getElementById('menuCategory').value,
+                price: parseFloat(document.getElementById('menuPrice').value),
+                stockQuantity: parseInt(document.getElementById('menuStock').value)
+            };
+
+            try {
+                const res = await fetch(API.MENU, {
+                    method: "POST",
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) throw new Error(`Status ${res.status}`);
+                showAlert("Menu item added/updated!", "success");
+                document.getElementById('menuItemForm').reset();
+                fetchMasterMenu();
+            } catch (err) {
+                showAlert(`Failed to save menu item: ${err.message}`, "danger");
+            }
+        }
+
+        // 4. Financial Sales Ledger
+        async function fetchSalesReport() {
+            try {
+                const res = await fetch(API.SALES, { headers: getAuthHeaders() });
+                if (!res.ok) return;
+                const sales = await res.json();
+                
+                const tbody = document.getElementById('salesLedgerTableBody');
+                tbody.innerHTML = "";
+                sales.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><span class="fw-bold">#${escapeHtml(s.orderId)}</span></td>
+                        <td>${escapeHtml(s.timestamp || 'N/A')}</td>
+                        <td><span class="badge bg-info text-dark">${escapeHtml(s.paymentMethod)}</span></td>
+                        <td>${s.itemCount || 1} items</td>
+                        <td class="text-end fw-bold text-success">$${Number(s.totalAmount).toFixed(2)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                console.error("Sales report error:", err);
+            }
+        }
+
+        // Helpers
+        function showAlert(msg, type) {
+            const container = document.getElementById('statusAlert');
+            const targetSpan = document.getElementById('alertMessage');
+            container.className = `alert alert-${type} text-center alert-dismissible fade show`;
+            targetSpan.innerText = msg;
+            setTimeout(() => hideAlert(), 3500);
+        }
+
+        function hideAlert() {
+            document.getElementById('statusAlert').classList.add('d-none');
+        }
+
+        async function logout() {
+            try { await fetch("api/logout", { method: "POST" }); } catch (e) { /* ignore */ }
+            window.location.href = "index.html";
+        }
+
+        function escapeHtml(str) {
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
